@@ -14,6 +14,7 @@ public class Field {
      * @return true bedeutet eine Kollision
      */
     public boolean detectCollision(int x, int y){
+        //TODO
         return field[x][y];
     }
 

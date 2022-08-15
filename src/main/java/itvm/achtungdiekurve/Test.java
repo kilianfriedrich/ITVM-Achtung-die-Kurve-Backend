@@ -57,7 +57,7 @@ public class Test extends TextWebSocketHandler {
     }
 
     public Point extractMessage(WebSocketMessage<?> message){
-        String[] s = message.toString().split("/");
+        String[] s = message.getPayload().toString().split("/");
         Point p = new Point();
         p.setLocation(Integer.parseInt(s[0]),Integer.parseInt(s[1]));
         return p;
