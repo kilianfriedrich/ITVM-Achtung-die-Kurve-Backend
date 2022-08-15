@@ -1,21 +1,30 @@
 package itvm.achtungdiekurve.model;
 
+import org.springframework.web.socket.WebSocketSession;
+
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Kurve {
 
-    private List<Point> point;
-    private String color;
+    private WebSocketSession session;
+    private List<Point> points = new ArrayList<Point>();
+    private Color color;
     private int id;
 
+    public Kurve(WebSocketSession _session, int _id, Color _color){
+        this.session = _session;
+        this.id = _id;
+        this.color = _color;
 
+    }
 
-    public String getColor() {
+    public Color getColor() {
         return color;
     }
 
-    public void setColor(String color) {
+    public void setColor(Color color) {
         this.color = color;
     }
 
@@ -28,10 +37,18 @@ public class Kurve {
     }
 
     public List<Point> getPoint() {
-        return point;
+        return points;
     }
 
     public void setPoint(List<Point> point) {
-        this.point = point;
+        this.points = point;
+    }
+
+    public void addPoint(Point p){
+        this.points.add(p);
+    }
+
+    public WebSocketSession getSession(){
+        return this.session;
     }
 }
