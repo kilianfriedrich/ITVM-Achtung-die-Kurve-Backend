@@ -9,7 +9,7 @@
     <script type="application/javascript">
 
         function connect() {
-            ws = new WebSocket("ws://10.62.142.241:8080/test");
+            ws = new WebSocket("ws://10.62.142.87:8080/test");
             ws.onmessage = function (e) {
                 printMessage(e.data);
             }

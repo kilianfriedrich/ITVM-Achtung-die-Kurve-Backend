@@ -2,6 +2,7 @@ package itvm.achtungdiekurve;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.CloseStatus;
+import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
@@ -19,6 +20,7 @@ public class Test extends TextWebSocketHandler {
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         super.afterConnectionEstablished(session);
         webSocketSessions.add(session);
+        session.sendMessage(new TextMessage("Hallo du!"));
     }
 
     @Override
