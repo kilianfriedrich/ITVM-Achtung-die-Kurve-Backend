@@ -7,6 +7,8 @@ import java.util.List;
 
 public class Utils {
 
+    private final int MAX_X = 999;
+    private final int MAX_Y = 999;
     /**
      * @author Vincenz Krüsmann
      * Überprüft jede
@@ -18,9 +20,13 @@ public class Utils {
             Point pointLast = kurve.getPoint().get(kurve.getPoint().size() - 1);
             Point pointFirst = kurve.getPoint().get(kurve.getPoint().size() - 2);
 
+            if(pointLast.getX() < 0 || pointLast.getX() > MAX_X || pointLast.getY() < 0 || pointLast.getY() > MAX_Y){
+                return true;
+            }
+
             //Neuester Punkt mit jeden Überprüfen
             for (Kurve elem: array) {
-                for (int i = 0; i < elem.getPoint().size(); i++) {
+                for (int i = 0; i < elem.getPoint().size() - 1; i++) {
                     double steigungOther = (elem.getPoint().get(i+1).getY()- elem.getPoint().get(i).getY())/
                             (elem.getPoint().get(i+1).getX() - elem.getPoint().get(i).getX());
                     double nOther =  elem.getPoint().get(i).getY() - elem.getPoint().get(i).getX() * steigungOther;
@@ -29,6 +35,7 @@ public class Utils {
                     double nPlayer =  pointLast.getY() - pointLast.getX() * steigungOther;
 
                     double x = (nPlayer - nOther) / steigungPlayer - steigungOther;
+
 
                     if(pointFirst.getX() < pointLast.getX() && elem.getPoint().get(i).getX() < elem.getPoint().get(i+1).getX() ){
                         if(x >= pointFirst.getX() && x <= pointLast.getX() && x >= elem.getPoint().get(i).getX() && x <= elem.getPoint().get(i+1).getX()){
