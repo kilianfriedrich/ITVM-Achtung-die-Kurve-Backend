@@ -48,6 +48,8 @@ public class Utils {
             b2.setLocation(b2.getY(), b2.getX());
         }
 
+        // FIXME wenn eine senkrechte und eine waagerechte Linie kommen crasht das
+
         double steigungOther = (b2.getY()- b1.getY())/
                 (b2.getX() - b1.getX());
         double nOther =  b1.getY() - b1.getX() * steigungOther;
