@@ -27,36 +27,10 @@ public class Utils {
             //Neuester Punkt mit jeden Überprüfen
             for (Kurve elem: array) {
                 for (int i = 0; i < elem.getPoint().size() - 1; i++) {
-                    double steigungOther = (elem.getPoint().get(i+1).getY()- elem.getPoint().get(i).getY())/
-                            (elem.getPoint().get(i+1).getX() - elem.getPoint().get(i).getX());
-                    double nOther =  elem.getPoint().get(i).getY() - elem.getPoint().get(i).getX() * steigungOther;
 
-                    double steigungPlayer = (pointLast.getY()-pointFirst.getY())/(pointLast.getX()-pointFirst.getX());
-                    double nPlayer =  pointLast.getY() - pointLast.getX() * steigungOther;
-
-                    double x = (nPlayer - nOther) / steigungPlayer - steigungOther;
-
-
-                    if(pointFirst.getX() < pointLast.getX() && elem.getPoint().get(i).getX() < elem.getPoint().get(i+1).getX() ){
-                        if(x >= pointFirst.getX() && x <= pointLast.getX() && x >= elem.getPoint().get(i).getX() && x <= elem.getPoint().get(i+1).getX()){
-                            return true;
-                        }
-                    }else if(pointFirst.getX() < pointLast.getX() && elem.getPoint().get(i).getX() >= elem.getPoint().get(i+1).getX()){
-                        if(x >= pointFirst.getX() && x <= pointLast.getX() && x <= elem.getPoint().get(i).getX() && x >= elem.getPoint().get(i+1).getX()){
-                            return true;
-                        }
+                    if(collides(pointFirst, pointLast, elem.getPoint().get(i), elem.getPoint().get(i + 1))) {
+                        return true;
                     }
-                    else if(pointFirst.getX() > pointLast.getX() && elem.getPoint().get(i).getX() >= elem.getPoint().get(i+1).getX()){
-                        if(x <= pointFirst.getX() && x >= pointLast.getX() && x <= elem.getPoint().get(i).getX() && x >= elem.getPoint().get(i+1).getX()){
-                            return true;
-                        }
-                    }else {
-                        if(x <= pointFirst.getX() && x >= pointLast.getX() && x <= elem.getPoint().get(i).getX() && x >= elem.getPoint().get(i+1).getX()){
-                            return true;
-                        }
-                    }
-
-
 
                 }
 
@@ -64,4 +38,45 @@ public class Utils {
         }
         return false;
     }
+    
+    private boolean collides(Point a1, Point a2, Point b1, Point b2) {
+        // Um 90 Grad drehen, wenn beide senkrecht
+        if(a1.getX() == a2.getX() || b1.getX() == b2.getX()) {
+            a1.setLocation(a1.getY(), a1.getX());
+            a2.setLocation(a2.getY(), a2.getX());
+            b1.setLocation(b1.getY(), b1.getX());
+            b2.setLocation(b2.getY(), b2.getX());
+        }
+
+        double steigungOther = (b2.getY()- b1.getY())/
+                (b2.getX() - b1.getX());
+        double nOther =  b1.getY() - b1.getX() * steigungOther;
+
+        double steigungPlayer = (a2.getY()-a1.getY())/(a2.getX()-a1.getX());
+        double nPlayer =  a2.getY() - a2.getX() * steigungOther;
+
+        double x = (nPlayer - nOther) / steigungPlayer - steigungOther;
+
+
+        if(a1.getX() < a2.getX() && b1.getX() < b2.getX() ){
+            if(x >= a1.getX() && x <= a2.getX() && x >= b1.getX() && x <= b2.getX()){
+                return true;
+            }
+        }else if(a1.getX() < a2.getX() && b1.getX() >= b2.getX()){
+            if(x >= a1.getX() && x <= a2.getX() && x <= b1.getX() && x >= b2.getX()){
+                return true;
+            }
+        }
+        else if(a1.getX() > a2.getX() && b1.getX() >= b2.getX()){
+            if(x <= a1.getX() && x >= a2.getX() && x <= b1.getX() && x >= b2.getX()){
+                return true;
+            }
+        }else {
+            if(x <= a1.getX() && x >= a2.getX() && x <= b1.getX() && x >= b2.getX()){
+                return true;
+            }
+        }
+        return false;
+    }
+    
 }
