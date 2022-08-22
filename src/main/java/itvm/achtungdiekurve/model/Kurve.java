@@ -8,10 +8,11 @@ import java.util.List;
 
 public class Kurve {
 
-    private WebSocketSession session;
+    private final WebSocketSession session;
     private List<Point> points = new ArrayList<Point>();
     private Color color;
     private int id;
+    private boolean isAlive = true;
 
     public Kurve(WebSocketSession _session, int _id, Color _color){
         this.session = _session;
@@ -50,5 +51,13 @@ public class Kurve {
 
     public WebSocketSession getSession(){
         return this.session;
+    }
+
+    public boolean getIsAlive(){
+        return this.isAlive;
+    }
+
+    public void setAlive(boolean alive) {
+        isAlive = alive;
     }
 }

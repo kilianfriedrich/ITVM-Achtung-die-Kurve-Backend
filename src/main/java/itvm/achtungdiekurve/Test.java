@@ -64,6 +64,6 @@ public class Test extends TextWebSocketHandler {
     }
 
     public String createBroadCastString(int id, Point p){
-        return id + "/" + p.getX() + "/" + p.getY();
+        return id + "/" + (int)p.getX() + "/" + (int)p.getY();
     }
 }
