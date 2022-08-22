@@ -1,5 +1,7 @@
 package itvm.achtungdiekurve;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import itvm.achtungdiekurve.model.Kurve;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.CloseStatus;
@@ -64,11 +66,10 @@ public class Connection extends TextWebSocketHandler {
 
     }
 
-    public Point extractMessage(WebSocketMessage<?> message){
-        String[] s = message.getPayload().toString().split("/");
-        Point p = new Point();
-        p.setLocation(Integer.parseInt(s[0]),Integer.parseInt(s[1]));
-        return p;
+    public Point extractMessage(WebSocketMessage<?> message) throws JsonProcessingException {
+        Point point = new ObjectMapper().readValue(message.getPayload().toString(), Point.class);
+        System.out.println(point.toString());
+        return point;
     }
 
     public String createBroadCastString(int id, Point p){

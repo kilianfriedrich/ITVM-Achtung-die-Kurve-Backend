@@ -17,24 +17,25 @@ public class Utils {
     public static Kurve detectCollsion(List<Kurve> array){
         for (Kurve kurve: array) {
             //der neueste Punkt
-            Point pointLast = kurve.getPoint().get(kurve.getPoint().size() - 1);
-            Point pointFirst = kurve.getPoint().get(kurve.getPoint().size() - 2);
+            if(kurve.getPoint().size() >= 2){
+                Point pointLast = kurve.getPoint().get(kurve.getPoint().size() - 1);
+                Point pointFirst = kurve.getPoint().get(kurve.getPoint().size() - 2);
 
-            if(pointLast.getX() < 0 || pointLast.getX() > MAX_X || pointLast.getY() < 0 || pointLast.getY() > MAX_Y){
-                return kurve;
-            }
-
-            //Neuester Punkt mit jeden Überprüfen
-            for (Kurve elem: array) {
-                for (int i = 0; i < elem.getPoint().size() - 1; i++) {
-
-                    if(collides(pointFirst, pointLast, elem.getPoint().get(i), elem.getPoint().get(i + 1))) {
-                        return kurve;
-                    }
-
+                if(pointLast.getX() < 0 || pointLast.getX() > MAX_X || pointLast.getY() < 0 || pointLast.getY() > MAX_Y){
+                    return kurve;
                 }
 
+                //Neuester Punkt mit jeden Überprüfen
+                for (Kurve elem: array) {
+                    for (int i = 0; i < elem.getPoint().size() - 1; i++) {
+
+                        if(collides(pointFirst, pointLast, elem.getPoint().get(i), elem.getPoint().get(i + 1))) {
+                            return kurve;
+                        }
+                    }
+                }
             }
+
         }
         return null;
     }
