@@ -57,13 +57,13 @@ public class Test extends TextWebSocketHandler {
     }
 
     public Point extractMessage(WebSocketMessage<?> message){
-        String[] s = message.toString().split("/");
+        String[] s = message.getPayload().toString().split("/");
         Point p = new Point();
         p.setLocation(Integer.parseInt(s[0]),Integer.parseInt(s[1]));
         return p;
     }
 
     public String createBroadCastString(int id, Point p){
-        return id + "/" + p.getX() + "/" + p.getY();
+        return id + "/" + (int)p.getX() + "/" + (int)p.getY();
     }
 }
