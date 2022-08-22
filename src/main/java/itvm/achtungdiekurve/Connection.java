@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class Test extends TextWebSocketHandler {
+public class Connection extends TextWebSocketHandler {
 
     List<WebSocketSession> webSocketSessions = Collections.synchronizedList(new ArrayList<>());
     List<Kurve> spieler = new ArrayList<Kurve>();
