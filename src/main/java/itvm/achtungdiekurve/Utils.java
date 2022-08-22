@@ -7,21 +7,21 @@ import java.util.List;
 
 public class Utils {
 
-    private final int MAX_X = 999;
-    private final int MAX_Y = 999;
+    private static final int MAX_X = 999;
+    private static final int MAX_Y = 999;
     /**
      * @author Vincenz Krüsmann
      * Überprüft jede
      * @return boolean
      */
-    public boolean detectCollsion(List<Kurve> array){
+    public static Kurve detectCollsion(List<Kurve> array){
         for (Kurve kurve: array) {
             //der neueste Punkt
             Point pointLast = kurve.getPoint().get(kurve.getPoint().size() - 1);
             Point pointFirst = kurve.getPoint().get(kurve.getPoint().size() - 2);
 
             if(pointLast.getX() < 0 || pointLast.getX() > MAX_X || pointLast.getY() < 0 || pointLast.getY() > MAX_Y){
-                return true;
+                return kurve;
             }
 
             //Neuester Punkt mit jeden Überprüfen
@@ -29,17 +29,17 @@ public class Utils {
                 for (int i = 0; i < elem.getPoint().size() - 1; i++) {
 
                     if(collides(pointFirst, pointLast, elem.getPoint().get(i), elem.getPoint().get(i + 1))) {
-                        return true;
+                        return kurve;
                     }
 
                 }
 
             }
         }
-        return false;
+        return null;
     }
     
-    private boolean collides(Point a1, Point a2, Point b1, Point b2) {
+    private static boolean collides(Point a1, Point a2, Point b1, Point b2) {
         // Um 90 Grad drehen, wenn beide senkrecht
         if(a1.getX() == a2.getX() || b1.getX() == b2.getX()) {
             a1.setLocation(a1.getY(), a1.getX());

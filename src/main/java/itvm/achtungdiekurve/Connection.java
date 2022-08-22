@@ -45,6 +45,13 @@ public class Connection extends TextWebSocketHandler {
         actPly.addPoint(pt);
         String broadCastStringMessage = createBroadCastString(actPly.getId(),pt);
 
+        Kurve kurve = Utils.detectCollsion(spieler);
+        if(kurve != null){
+            killPlayer(kurve);
+            webSocketSessions.remove(kurve.getSession());
+            spieler.remove(kurve);
+        }
+
         webSocketSessions.forEach(_session -> {
             if(!(_session == session)){
                 try {
@@ -54,6 +61,7 @@ public class Connection extends TextWebSocketHandler {
                 }
             }
         });
+
     }
 
     public Point extractMessage(WebSocketMessage<?> message){
@@ -66,4 +74,17 @@ public class Connection extends TextWebSocketHandler {
     public String createBroadCastString(int id, Point p){
         return id + "/" + (int)p.getX() + "/" + (int)p.getY();
     }
+
+    public void killPlayer(Kurve dead){
+        String s = "kill" + dead.getId();
+        spieler.forEach(kurve -> {
+            try {
+                kurve.getSession().sendMessage(new TextMessage(s));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+
+    }
 }
+
