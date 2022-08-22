@@ -76,6 +76,7 @@ public class Connection extends TextWebSocketHandler {
     }
 
     public void killPlayer(){
+        keep_alive_check(spieler,webSocketSessions);
         spieler.forEach(kurve -> {
             try {
                 kurve.getSession().sendMessage(new TextMessage("-1/-1"));
@@ -84,6 +85,15 @@ public class Connection extends TextWebSocketHandler {
             }
         });
 
+    }
+
+    public void keep_alive_check(List<Kurve> kurven,List<WebSocketSession> sessions){
+        kurven.forEach(kurve -> {
+            if(!kurve.getSession().isOpen()){
+                sessions.remove(kurve.getSession());
+                kurven.remove(kurve);
+            }
+        });
     }
 }
 
