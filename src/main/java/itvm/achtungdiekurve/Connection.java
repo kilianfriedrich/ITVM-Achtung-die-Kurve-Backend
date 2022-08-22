@@ -43,43 +43,53 @@ public class Connection extends TextWebSocketHandler {
     public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
         super.handleMessage(session, message);
         Point pt = extractMessage(message);
-        Kurve actPly = spieler.stream().filter(kurve -> kurve.getSession() == session).collect(Collectors.toList()).get(0);
-        actPly.addPoint(pt);
-        String broadCastStringMessage = createBroadCastString(actPly.getId(),pt);
+        if(pt != null && webSocketSessions.contains(session)){
+            Kurve actPly = spieler.stream().filter(kurve -> kurve.getSession() == session).findAny().orElseThrow();
+            actPly.addPoint(pt);
+            String broadCastStringMessage = createBroadCastString(actPly.getId(),pt);
 
-        Kurve kurve = Utils.detectCollsion(spieler);
-        if(kurve != null){
-            killPlayer();
-            webSocketSessions.remove(kurve.getSession());
-            spieler.remove(kurve);
-        }
-
-        webSocketSessions.forEach(_session -> {
-            if(!(_session == session)){
-                try {
-                    _session.sendMessage(new TextMessage(broadCastStringMessage));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+            Kurve kurve = Utils.detectCollsion(spieler);
+            if(kurve != null){
+                killPlayer(kurve);
+                webSocketSessions.remove(kurve.getSession());
+                spieler.remove(kurve);
+                System.out.println("kill");
             }
-        });
+
+            webSocketSessions.forEach(_session -> {
+                if(!(_session == session)){
+                    try {
+                        _session.sendMessage(new TextMessage(broadCastStringMessage));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+
+        }
 
     }
 
     public Point extractMessage(WebSocketMessage<?> message) throws JsonProcessingException {
-        Point point = new ObjectMapper().readValue(message.getPayload().toString(), Point.class);
-        System.out.println(point.toString());
-        return point;
+        try{
+            Point point = new ObjectMapper().readValue(message.getPayload().toString(), Point.class);
+            System.out.println(point.toString());
+            return point;
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+       return null;
     }
 
     public String createBroadCastString(int id, Point p){
         return id + "/" + (int)p.getX() + "/" + (int)p.getY();
     }
 
-    public void killPlayer(){
+    public void killPlayer(Kurve dead){
+        String s = dead.getId() + "/-1/-1";
         spieler.forEach(kurve -> {
             try {
-                kurve.getSession().sendMessage(new TextMessage("-1/-1"));
+                kurve.getSession().sendMessage(new TextMessage(s));
             } catch (IOException e) {
                 e.printStackTrace();
             }
