@@ -49,7 +49,7 @@ public class Connection extends TextWebSocketHandler {
 
         Kurve kurve = Utils.detectCollsion(spieler);
         if(kurve != null){
-            killPlayer(kurve);
+            killPlayer();
             webSocketSessions.remove(kurve.getSession());
             spieler.remove(kurve);
         }
@@ -76,11 +76,10 @@ public class Connection extends TextWebSocketHandler {
         return id + "/" + (int)p.getX() + "/" + (int)p.getY();
     }
 
-    public void killPlayer(Kurve dead){
-        String s = "kill" + dead.getId();
+    public void killPlayer(){
         spieler.forEach(kurve -> {
             try {
-                kurve.getSession().sendMessage(new TextMessage(s));
+                kurve.getSession().sendMessage(new TextMessage("-1/-1"));
             } catch (IOException e) {
                 e.printStackTrace();
             }
