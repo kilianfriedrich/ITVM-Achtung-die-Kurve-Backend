@@ -37,6 +37,7 @@ public class Connection extends TextWebSocketHandler {
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
         super.afterConnectionClosed(session, status);
         webSocketSessions.remove(session);
+        spieler.removeIf(kurve -> kurve.getSession().equals(session));
     }
 
     @Override
@@ -45,7 +46,15 @@ public class Connection extends TextWebSocketHandler {
         Point pt = extractMessage(message);
         if(pt != null && webSocketSessions.contains(session)){
             Kurve actPly = spieler.stream().filter(kurve -> kurve.getSession() == session).findAny().orElseThrow();
-            actPly.addPoint(pt);
+            if(actPly.getPoint().size()-1 >= 0){
+                Point last = actPly.getPoint().get(actPly.getPoint().size()-1);
+                if(pt.getX() != last.getX() || pt.getY() != last.getY()){
+                    actPly.addPoint(pt);
+                }
+            } else {
+                actPly.addPoint(pt);
+            }
+
             String broadCastStringMessage = createBroadCastString(actPly.getId(),pt);
 
             Kurve kurve = Utils.detectCollsion(spieler);
@@ -86,6 +95,7 @@ public class Connection extends TextWebSocketHandler {
     }
 
     public void killPlayer(Kurve dead){
+        keep_alive_check(spieler,webSocketSessions);
         String s = dead.getId() + "/-1/-1";
         spieler.forEach(kurve -> {
             try {
@@ -95,6 +105,15 @@ public class Connection extends TextWebSocketHandler {
             }
         });
 
+    }
+
+    public void keep_alive_check(List<Kurve> kurven,List<WebSocketSession> sessions){
+        kurven.forEach(kurve -> {
+            if(!kurve.getSession().isOpen()){
+                sessions.remove(kurve.getSession());
+                kurven.remove(kurve);
+            }
+        });
     }
 }
 
