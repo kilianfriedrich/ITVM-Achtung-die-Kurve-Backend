@@ -12,13 +12,12 @@ public class Kurve {
     private List<Point> points = new ArrayList<Point>();
     private Color color;
     private int id;
-    private boolean isAlive = true;
+    private boolean isAlive = false;
 
     public Kurve(WebSocketSession _session, int _id, Color _color){
         this.session = _session;
         this.id = _id;
         this.color = _color;
-
     }
 
     public Color getColor() {

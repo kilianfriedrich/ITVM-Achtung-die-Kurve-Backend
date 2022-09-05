@@ -19,17 +19,20 @@ import java.util.List;
 @Service
 public class Connection extends TextWebSocketHandler {
 
-    List<WebSocketSession> webSocketSessions = Collections.synchronizedList(new ArrayList<>());
-    List<Kurve> spieler = new ArrayList<Kurve>();
+    private List<WebSocketSession> webSocketSessions = Collections.synchronizedList(new ArrayList<>());
+    private List<Kurve> spieler = new ArrayList<Kurve>();
     int id = 0;
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         super.afterConnectionEstablished(session);
+
         int _id = id++;
         webSocketSessions.add(session);
+
         spieler.add(new Kurve(session,_id,new Color((int)(Math.random() * 0x1000000))));
         session.sendMessage(new TextMessage(String.valueOf(_id)));
+
     }
 
     @Override
@@ -45,6 +48,8 @@ public class Connection extends TextWebSocketHandler {
         long alt = System.nanoTime();
         if(message.getPayload().toString().equals("start")){
             System.out.println("start");
+            System.out.println(webSocketSessions.size());
+
             webSocketSessions.forEach(elem -> {
                 try {
                     elem.sendMessage(new TextMessage("start"));
@@ -52,6 +57,7 @@ public class Connection extends TextWebSocketHandler {
                     e.printStackTrace();
                 }
             });
+            spieler.forEach(schlange -> schlange.setAlive(true));
         }else {
             Point pt = extractMessage(message);
             if(pt != null && webSocketSessions.contains(session)){
@@ -88,10 +94,10 @@ public class Connection extends TextWebSocketHandler {
             }
         }
 
-        System.out.println((alt - System.nanoTime())/10E9);
-
 
     }
+
+
 
     public Point extractMessage(WebSocketMessage<?> message) throws JsonProcessingException {
         try{
@@ -121,6 +127,16 @@ public class Connection extends TextWebSocketHandler {
                 e.printStackTrace();
             }
         });
+
+        if(spieler.stream().filter(Kurve::getIsAlive).count() <= 1){
+            //spielfeld leeren
+            spieler.forEach(schlange -> {
+                schlange.setAlive(false);
+                schlange.setPoint(new ArrayList<>());
+            });
+
+
+        }
 
     }
 
