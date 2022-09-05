@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class Connection extends TextWebSocketHandler {
@@ -45,7 +46,6 @@ public class Connection extends TextWebSocketHandler {
     @Override
     public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
         super.handleMessage(session, message);
-        long alt = System.nanoTime();
         if(message.getPayload().toString().equals("start")){
             System.out.println("start");
             System.out.println(webSocketSessions.size());
@@ -58,7 +58,8 @@ public class Connection extends TextWebSocketHandler {
                 }
             });
             spieler.forEach(schlange -> schlange.setAlive(true));
-        }else {
+        }
+        else if(check_session_spieler(session)){
             Point pt = extractMessage(message);
             if(pt != null && webSocketSessions.contains(session)){
                 Kurve actPly = spieler.stream().filter(kurve -> kurve.getSession() == session).findAny().orElseThrow();
@@ -76,7 +77,6 @@ public class Connection extends TextWebSocketHandler {
                 Kurve kurve = Utils.detectCollsion(spieler);
                 if(kurve != null){
                     killPlayer(kurve);
-
                     System.out.println("kill");
                 }
 
@@ -146,6 +146,17 @@ public class Connection extends TextWebSocketHandler {
                 sessions.remove(kurve.getSession());
             }
         });
+    }
+
+    public boolean check_session_spieler(WebSocketSession session){
+        try{
+            Optional<Kurve> sp = spieler.stream().filter(kurve -> kurve.getSession().equals(session)).findAny();
+            return sp.isPresent() && sp.get().getIsAlive();
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            return false;
+        }
     }
 }
 

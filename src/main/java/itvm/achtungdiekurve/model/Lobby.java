@@ -6,7 +6,7 @@ import java.util.List;
 public class Lobby {
 
     List<Kurve> kurveList = new ArrayList<>();
-    private final static int MAX_ANZAHL_KURVEN = 10;
+    private final static int MAX_ANZAHL_KURVEN = 4;
     private static int ID_CTR = 0;
     private int id;
 

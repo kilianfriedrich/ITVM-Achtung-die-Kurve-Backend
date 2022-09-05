@@ -5,6 +5,7 @@ import org.springframework.web.socket.WebSocketSession;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class Kurve {
 
@@ -14,10 +15,10 @@ public class Kurve {
     private int id;
     private boolean isAlive = false;
 
-    public Kurve(WebSocketSession _session, int _id, Color _color){
-        this.session = _session;
-        this.id = _id;
-        this.color = _color;
+    public Kurve(WebSocketSession session, int id, Color color){
+        this.session = session;
+        this.id = id;
+        this.color = color;
     }
 
     public Color getColor() {
