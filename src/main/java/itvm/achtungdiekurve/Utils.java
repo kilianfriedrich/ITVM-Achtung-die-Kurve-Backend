@@ -17,12 +17,15 @@ public class Utils {
      */
     public static Kurve detectCollsion(List<Kurve> array){
         for (Kurve kurve: array) {
+            if(!kurve.getIsAlive()) {
+                continue;
+            }
+
             //der neueste Punkt
             if(kurve.getPoint().size() >= 2){
                 Point pointLast = kurve.getPoint().get(kurve.getPoint().size() - 1);
                 Point pointFirst = kurve.getPoint().get(kurve.getPoint().size() - 2);
 
-                System.out.println("check: "+ pointLast.toString());
                 if(pointLast.getX() < 0 || pointLast.getX() > MAX_X || pointLast.getY() < 0 || pointLast.getY() > MAX_Y){
                     return kurve;
                 }
@@ -30,6 +33,7 @@ public class Utils {
                 List<Kurve> copy = new ArrayList<>(array);
                 //Neuester Punkt mit jeden Überprüfen
                 for (Kurve elem: copy) {
+
                     int indx = elem.getPoint().indexOf(pointLast);
                     if(indx > 0 && (elem != kurve || indx <= elem.getPoint().size() - 2)) {
                         return kurve;
@@ -71,11 +75,6 @@ public class Utils {
 
         double x = (nPlayer - nOther) / steigungPlayer - steigungOther;
 
-        if(Math.abs(a1.getX() - b1.getX()) < 10 && Math.abs(a1.getY() - b1.getY()) < 10){
-            System.out.printf("test: %s, %s%n", a1, a2);
-            System.out.printf("test: %s, %s\n", b1, b2);
-            System.out.println("-----------");
-        }
 
         if(a1.getX() < a2.getX() && b1.getX() < b2.getX() ){
             if(x >= a1.getX() && x <= a2.getX() && x >= b1.getX() && x <= b2.getX()){

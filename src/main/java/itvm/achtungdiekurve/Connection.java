@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class Connection extends TextWebSocketHandler {
@@ -43,48 +42,65 @@ public class Connection extends TextWebSocketHandler {
     @Override
     public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
         super.handleMessage(session, message);
-        Point pt = extractMessage(message);
-        if(pt != null && webSocketSessions.contains(session)){
-            Kurve actPly = spieler.stream().filter(kurve -> kurve.getSession() == session).findAny().orElseThrow();
-            if(actPly.getPoint().size()-1 >= 0){
-                Point last = actPly.getPoint().get(actPly.getPoint().size()-1);
-                if(pt.getX() != last.getX() || pt.getY() != last.getY()){
-                    actPly.addPoint(pt);
-                }
-            } else {
-                actPly.addPoint(pt);
-            }
-
-            String broadCastStringMessage = createBroadCastString(actPly.getId(),pt);
-
-            Kurve kurve = Utils.detectCollsion(spieler);
-            if(kurve != null){
-                killPlayer(kurve);
-                webSocketSessions.remove(kurve.getSession());
-                spieler.remove(kurve);
-                System.out.println("kill");
-            }
-
-            webSocketSessions.forEach(_session -> {
-                if(!(_session == session)){
-                    try {
-                        _session.sendMessage(new TextMessage(broadCastStringMessage));
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+        long alt = System.nanoTime();
+        if(message.getPayload().toString().equals("start")){
+            System.out.println("start");
+            webSocketSessions.forEach(elem -> {
+                try {
+                    elem.sendMessage(new TextMessage("start"));
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             });
+        }else {
+            Point pt = extractMessage(message);
+            if(pt != null && webSocketSessions.contains(session)){
+                Kurve actPly = spieler.stream().filter(kurve -> kurve.getSession() == session).findAny().orElseThrow();
+                if(actPly.getPoint().size()-1 >= 0){
+                    Point last = actPly.getPoint().get(actPly.getPoint().size()-1);
+                    if(pt.getX() != last.getX() || pt.getY() != last.getY()){
+                        actPly.addPoint(pt);
+                    }
+                } else {
+                    actPly.addPoint(pt);
+                }
 
+                String broadCastStringMessage = createBroadCastString(actPly.getId(),pt);
+
+                Kurve kurve = Utils.detectCollsion(spieler);
+                if(kurve != null){
+                    killPlayer(kurve);
+
+                    System.out.println("kill");
+                }
+
+                List<WebSocketSession> socketSessionList = new ArrayList<>(webSocketSessions);
+                socketSessionList.forEach(_session -> {
+                    if(!(_session == session)){
+                        try {
+                            _session.sendMessage(new TextMessage(broadCastStringMessage));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+
+            }
         }
+
+        System.out.println((alt - System.nanoTime())/10E9);
+
 
     }
 
     public Point extractMessage(WebSocketMessage<?> message) throws JsonProcessingException {
         try{
+
             Point point = new ObjectMapper().readValue(message.getPayload().toString(), Point.class);
-            System.out.println(point.toString());
             return point;
+
         }catch (Exception e){
+
             e.printStackTrace();
         }
        return null;
@@ -97,6 +113,7 @@ public class Connection extends TextWebSocketHandler {
     public void killPlayer(Kurve dead){
         keep_alive_check(spieler,webSocketSessions);
         String s = dead.getId() + "/-1/-1";
+        dead.setAlive(false);
         spieler.forEach(kurve -> {
             try {
                 kurve.getSession().sendMessage(new TextMessage(s));
@@ -111,7 +128,6 @@ public class Connection extends TextWebSocketHandler {
         kurven.forEach(kurve -> {
             if(!kurve.getSession().isOpen()){
                 sessions.remove(kurve.getSession());
-                kurven.remove(kurve);
             }
         });
     }
