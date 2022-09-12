@@ -124,7 +124,7 @@ public class Connection extends TextWebSocketHandler {
     }
 
     public void killPlayer(Kurve dead){
-        keep_alive_check(spieler,webSocketSessions);
+        //keep_alive_check(spieler,webSocketSessions);
         String s = dead.getId() + "/-1/-1";
         dead.setAlive(false);
         List<Kurve> kurveList = Collections.synchronizedList(spieler);
