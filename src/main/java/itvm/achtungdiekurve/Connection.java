@@ -32,7 +32,9 @@ public class Connection extends TextWebSocketHandler {
         webSocketSessions.add(session);
 
         spieler.add(new Kurve(session,_id,new Color((int)(Math.random() * 0x1000000))));
-        session.sendMessage(new TextMessage(String.valueOf(_id)));
+        synchronized (session){
+            session.sendMessage(new TextMessage(String.valueOf(_id)));
+        }
 
     }
 
@@ -40,7 +42,12 @@ public class Connection extends TextWebSocketHandler {
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
         super.afterConnectionClosed(session, status);
         webSocketSessions.remove(session);
-        spieler.removeIf(kurve -> kurve.getSession().equals(session));
+        spieler.removeIf(kurve -> {
+            if(kurve != null){
+                return kurve.getSession().equals(session);
+            }
+            return false;
+        });
     }
 
     @Override
@@ -80,7 +87,7 @@ public class Connection extends TextWebSocketHandler {
                     System.out.println("kill");
                 }
 
-                List<WebSocketSession> socketSessionList = new ArrayList<>(webSocketSessions);
+                List<WebSocketSession> socketSessionList = Collections.synchronizedList(webSocketSessions);
                 socketSessionList.forEach(_session -> {
                     if(!(_session == session)){
                         try {
@@ -120,7 +127,8 @@ public class Connection extends TextWebSocketHandler {
         keep_alive_check(spieler,webSocketSessions);
         String s = dead.getId() + "/-1/-1";
         dead.setAlive(false);
-        spieler.forEach(kurve -> {
+        List<Kurve> kurveList = Collections.synchronizedList(spieler);
+        kurveList.forEach(kurve -> {
             try {
                 kurve.getSession().sendMessage(new TextMessage(s));
             } catch (IOException e) {
